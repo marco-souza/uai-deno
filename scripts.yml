@@ -1,0 +1,15 @@
+scripts:
+
+  uai:
+    desc: Call CLI
+    cmd: ./mod.ts
+    unstable: true
+    allow:
+      - all
+
+  degit:
+    desc: Call degit cli
+    cmd: ./mod.ts degit
+    unstable: true
+    allow:
+      - all

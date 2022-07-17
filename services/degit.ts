@@ -1,8 +1,9 @@
-import { colors, Command } from 'cliffy';
+import { Command } from 'cliffy';
 import { $ } from 'zx';
 
 export function addDegitHandler(cli: Command) {
 	cli
+		.description('Straightforward project scaffolding')
 		.command('degit', 'degit but made in deno')
 		.alias('dg')
 		.option('-b, --branch [branch:string]', 'Specify a branch to clone', {
@@ -23,30 +24,26 @@ async function cliHandler(
 	repo: string,
 	folder?: string,
 ) {
-	try {
-		const [username, project, ...path] = repo.split('/');
-		if (project == null) throw Error('You need to specify a project');
+	const [username, project, ...path] = repo.split('/');
+	if (project == null) throw Error('You need to specify a project');
 
-		const githubRepoUrl = `git@github.com:${username}/${project}.git`;
-		const distFolder = folder ?? project;
+	const githubRepoUrl = `git@github.com:${username}/${project}.git`;
+	const distFolder = folder ?? path.at(-1) ?? project;
 
-		$.verbose = verbose;
+	$.verbose = verbose;
 
-		console.log(`🔬 Cloning repo ${distFolder}...`);
-		await $`
+	console.log(`🔬 Cloning repo ${distFolder}...`);
+	await $`
     git clone -b ${branch} ${githubRepoUrl} /tmp/degit-cache && \
     mv /tmp/degit-cache/${path?.join('/') ?? ''} ${distFolder} && \
     rm -rf ${distFolder}/.git
     rm -rf /tmp/degit-cache
   `;
 
-		console.log(`⚙  Initializing git ...`);
-		await $
-			`cd ${folder} && git init && git add . && git commit -m "initial commit"`;
+	console.log(`⚙  Initializing git ...`);
+	await $
+		`cd ${distFolder} && git init && git add . && git commit -m "initial commit"`;
 
-		console.log(`\n🦕 Done! You're ready to fly! 🚀`);
-		console.log(`\ncd ${distFolder} `);
-	} catch (error) {
-		console.error(colors.red(error.message));
-	}
+	console.log(`\n🦕 Done! You're ready to fly! 🚀`);
+	console.log(`\ncd ${distFolder} `);
 }

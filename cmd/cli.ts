@@ -10,10 +10,12 @@ export async function run() {
 }
 
 function makeCommand() {
-	const mainCli = new Command();
-
 	// Main command
-	mainCli.name('uai').version('v1.0.0').description('Utility AI CLI');
+	const mainCli = new Command()
+		.name('uai')
+		.version('v1.0.0')
+		.description('Utility CLI tool')
+		.action(() => mainCli.showHelp());
 
 	// Add sub-commands
 	addDegitHandler(mainCli);

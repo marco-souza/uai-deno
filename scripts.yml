@@ -13,3 +13,7 @@ scripts:
     unstable: true
     allow:
       - all
+
+  fmt:
+    desc: format files
+    cmd: deno fmt .

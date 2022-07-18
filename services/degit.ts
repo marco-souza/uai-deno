@@ -9,18 +9,20 @@ export function addDegitHandler(cli: Command) {
 		.option('-b, --branch [branch:string]', 'Specify a branch to clone', {
 			default: 'main',
 		})
-		.option('-v, --verbose', 'Verbose output', { default: false })
+		.option('-v, --verbose', 'Verbose output')
+		.option('-g, --git', 'Initialize git output')
 		.arguments('<repo:string> [folder:string]')
 		.action(cliHandler);
 }
 
 interface IOptions {
 	branch: string;
+	git: boolean;
 	verbose: boolean;
 }
 
 async function cliHandler(
-	{ branch, verbose }: IOptions,
+	{ git: enableGit, branch, verbose }: IOptions,
 	repo: string,
 	folder?: string,
 ) {
@@ -40,9 +42,13 @@ async function cliHandler(
     rm -rf /tmp/degit-cache
   `;
 
-	console.log(`⚙  Initializing git ...`);
-	await $
-		`cd ${distFolder} && git init && git add . && git commit -m "initial commit"`;
+	if (enableGit) {
+		console.log(`⚙  Initializing git ...`);
+		await $`
+			cd ${distFolder} && git init && \
+			git add . && git commit -m "initial commit"
+		`;
+	}
 
 	console.log(`\n🦕 Done! You're ready to fly! 🚀`);
 	console.log(`\ncd ${distFolder} `);

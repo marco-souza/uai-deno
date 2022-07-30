@@ -15,7 +15,7 @@ function makeCommand() {
 	const mainCli = new Command()
 		.name('uai')
 		.version('v1.0.1')
-		.description('Automation Utility Interface')
+		.description('Utility CLI tool')
 		.action(() => mainCli.showHelp());
 
 	// Add sub-commands

@@ -3,8 +3,8 @@ import { $ } from 'zx';
 
 export function addDegitHandler(cli: Command) {
 	cli
-		.description('Straightforward project scaffolding')
 		.command('degit', 'degit but made in deno')
+		.description('Straightforward project scaffolding')
 		.alias('dg')
 		.option('-b, --branch [branch:string]', 'Specify a branch to clone', {
 			default: 'main',

@@ -21,6 +21,13 @@ scripts:
     allow:
       - all
 
+  compile:
+    desc: Compile package to binary
+    cmd: deno compile ./main.ts -o uai
+    unstable: true
+    allow:
+      - all
+
   fmt:
     desc: format files
     cmd: deno fmt .

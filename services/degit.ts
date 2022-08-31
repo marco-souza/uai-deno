@@ -10,7 +10,10 @@ export function addDegitHandler(cli: Command) {
 			default: 'main',
 		})
 		.option('-g, --git', 'Initialize git output')
-		.option('-t, --template', 'use deno templates from github.com/marco-souza/deno-templates')
+		.option(
+			'-t, --template',
+			'use deno templates from github.com/marco-souza/deno-templates',
+		)
 		.option('-v, --verbose', 'Verbose output')
 		.arguments('<repo:string> [folder:string]')
 		.action(cliHandler);
@@ -28,7 +31,7 @@ async function cliHandler(
 	repo: string,
 	folder?: string,
 ) {
-	const [username, project, path] = parseRepositoryInfo(repo, template)
+	const [username, project, path] = parseRepositoryInfo(repo, template);
 	const githubRepoUrl = `git@github.com:${username}/${project}.git`;
 	const distFolder = folder ?? path.split('/').at(-1) ?? project;
 
@@ -54,15 +57,19 @@ async function cliHandler(
 	console.log(`\ncd ${distFolder} `);
 }
 
-type RepositoryInfo = [username: string, project: string, path: string]
+type RepositoryInfo = [username: string, project: string, path: string];
 
-function parseRepositoryInfo(repo: string, templates: boolean = false): RepositoryInfo {
-	const repoSplitted = repo.split('/')
-	if (templates)
-		return ['marco-souza', 'deno-templates', repo]
+function parseRepositoryInfo(
+	repo: string,
+	templates: boolean = false,
+): RepositoryInfo {
+	const repoSplitted = repo.split('/');
+	if (templates) {
+		return ['marco-souza', 'deno-templates', repo];
+	}
 
 	const [username, project, ...path] = repoSplitted;
 	if (project == null) throw Error('You need to specify a project');
 
-	return [username, project, path.join('/')]
+	return [username, project, path.join('/')];
 }

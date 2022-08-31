@@ -37,6 +37,10 @@ async (
 	if (['install', 'remove'].includes(cmd)) {
 		evalCmd += ` ${(packages ?? []).join(' ')}`;
 	}
+	if ((cmd === 'update')) {
+		// update other package managers
+		evalCmd += '; npm up -g npm; sudo deno upgrade';
+	}
 
 	try {
 		await $`eval ${evalCmd}`;

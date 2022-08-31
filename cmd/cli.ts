@@ -1,6 +1,7 @@
 import { Command } from 'cliffy';
 import { addDegitHandler } from '../services/degit.ts';
 import { addDolCmd } from '../services/dol.ts';
+import { addPkgCmd } from '../services/pkg.ts';
 
 /**
  * Main CLI command, as of right now the CLI does not have sub-commands.
@@ -21,6 +22,7 @@ function makeCommand() {
 	// Add sub-commands
 	addDegitHandler(mainCli);
 	addDolCmd(mainCli);
+	addPkgCmd(mainCli);
 
 	return mainCli;
 }

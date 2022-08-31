@@ -2,14 +2,21 @@ scripts:
 
   uai:
     desc: Call CLI
-    cmd: ./mod.ts
+    cmd: ./main.ts
     unstable: true
     allow:
       - all
 
   degit:
     desc: Call degit cli
-    cmd: ./mod.ts degit
+    cmd: ./main.ts degit
+    unstable: true
+    allow:
+      - all
+
+  pkg:
+    desc: Call pkg cli
+    cmd: ./main.ts pkg
     unstable: true
     allow:
       - all

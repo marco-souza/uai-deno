@@ -7,6 +7,7 @@ export function addPkgCmd(cli: Command) {
 		.description('Agnostic Package Manager')
 		// install
 		.command('i, install [...packages]', 'install packages')
+		.option('-c, --cask', 'enable casks only for osx')
 		.action(makeCommandHandler('install'))
 		// remove
 		.command('r, remove [...packages]', 'remove packages installed')
@@ -19,35 +20,45 @@ export function addPkgCmd(cli: Command) {
 		.action(makeCommandHandler('update'));
 
 	// bind sub-command
-	cli.command('pkg', pkgCmd)
-		.action(() => pkgCmd.showHelp());
+	cli.command('pkg', pkgCmd).action(() => pkgCmd.showHelp());
 }
 
-type IOptions = {};
-
-const makeCommandHandler = (cmd: PkgCommands) =>
-async (
-	_opts: IOptions,
-	packages: string[],
-) => {
-	const pkg = await findPkgCommands();
-	if (pkg == null) return;
-
-	let evalCmd = pkg[cmd];
-	if (['install', 'remove', 'search'].includes(cmd)) {
-		evalCmd += ` ${(packages ?? []).join(' ')}`;
-	}
-	if ((cmd === 'update')) {
-		// update other package managers
-		evalCmd += '; npm up -g npm; sudo deno upgrade';
-	}
-
-	try {
-		await $`eval ${evalCmd}`;
-	} catch (error) {
-		console.error('%c[error]', 'color: tomato;', 'Something when wrong');
-	}
+type IOptions = {
+	cask: boolean;
 };
+
+const makeCommandHandler =
+	(cmd: PkgCommands) => async (opts: IOptions, packages: string[]) => {
+		const packageManger = await findPkgCommands();
+
+		if (packageManger == null) {
+			throw new Error('Package Manager not found :(');
+		}
+
+		const [pm, pkg] = packageManger;
+		let evalCmd = pkg[cmd];
+
+		if (['install', 'remove', 'search'].includes(cmd)) {
+			if (cmd === 'install' && pm === 'brew' && opts.cask) {
+				evalCmd += ' --cask';
+			}
+			evalCmd += ` ${(packages ?? []).join(' ')}`;
+		}
+		if (cmd === 'update') {
+			// update other package managers
+			evalCmd += '; npm up -g npm; sudo deno upgrade';
+		}
+
+		try {
+			await $`eval ${evalCmd}`;
+		} catch (error) {
+			console.error(
+				'%c[error]',
+				'color: tomato;',
+				'Something when wrong',
+			);
+		}
+	};
 
 type IPkgManCommands = {
 	install: string;
@@ -62,16 +73,10 @@ type PkgManMap = {
 	yay: IPkgManCommands;
 	pamac: IPkgManCommands;
 	apt: IPkgManCommands;
-	// brew: IPkgManCommands;
+	brew: IPkgManCommands;
 };
 
 const pkgManMap: PkgManMap = {
-	apt: {
-		install: 'sudo apt install -y',
-		search: 'sudo apt search',
-		update: 'sudo apt update; sudo apt upgrade;',
-		remove: 'sudo apt remove -y',
-	},
 	yay: {
 		install: 'yay -S --noconfirm',
 		search: 'yay -Ss',
@@ -84,11 +89,25 @@ const pkgManMap: PkgManMap = {
 		update: 'sudo pamac update',
 		remove: 'sudo pamac remove',
 	},
+	brew: {
+		install: 'brew install',
+		search: 'brew search',
+		update: 'brew tap homebrew/cask && brew upgrade',
+		remove: 'brew uninstall',
+	},
+	apt: {
+		install: 'sudo apt install -y',
+		search: 'sudo apt search',
+		update: 'sudo apt update; sudo apt upgrade;',
+		remove: 'sudo apt remove -y',
+	},
 };
 
 async function findPkgCommands() {
 	for (const pm in pkgManMap) {
-		if (await commandExists(pm)) return pkgManMap[pm as keyof PkgManMap];
+		if (await commandExists(pm)) {
+			return [pm, pkgManMap[pm as keyof PkgManMap]] as const;
+		}
 	}
 }
 

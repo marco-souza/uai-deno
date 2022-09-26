@@ -12,7 +12,7 @@ export function addPkgCmd(cli: Command) {
 		.command('r, remove [...packages]', 'remove packages installed')
 		.action(makeCommandHandler('remove'))
 		// search
-		.command('s, search [query]', 'search with optional query')
+		.command('s, search [...packages]', 'search with optional query')
 		.action(makeCommandHandler('search'))
 		// update
 		.command('u, update', 'update installed packages')
@@ -34,7 +34,7 @@ async (
 	if (pkg == null) return;
 
 	let evalCmd = pkg[cmd];
-	if (['install', 'remove'].includes(cmd)) {
+	if (['install', 'remove', 'search'].includes(cmd)) {
 		evalCmd += ` ${(packages ?? []).join(' ')}`;
 	}
 	if ((cmd === 'update')) {
